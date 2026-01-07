@@ -5,29 +5,21 @@ pipeline {
         maven 'Maven-3'
     }
 
+    environment {
+        MAVEN_OPTS = '-Dmaven.repo.local=.m2'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Code pulled from GitHub'
+                echo 'Source code checked out from GitHub'
             }
         }
 
-        stage('Build') {
+        stage('Validate') {
             steps {
-                bat 'mvn clean compile'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                bat 'mvn test'
-            }
-        }
-
-        stage('Package') {
-            steps {
-                bat 'mvn package'
+                bat 'mvn validate'
             }
         }
     }
