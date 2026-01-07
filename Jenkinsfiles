@@ -1,16 +1,26 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven-3'
+    }
+
     stages {
-        stage('Checkout Code') {
+        stage('Build') {
             steps {
-                echo 'Code checked out from GitHub'
+                bat 'mvn clean compile'
             }
         }
 
-        stage('Build') {
+        stage('Test') {
             steps {
-                echo 'Build step placeholder'
+                bat 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                bat 'mvn package'
             }
         }
     }
