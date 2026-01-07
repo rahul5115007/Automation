@@ -7,32 +7,27 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                echo 'Code pulled from GitHub'
+            }
+        }
+
         stage('Build') {
             steps {
-                bat 'mvn clean package'
+                bat 'mvn clean compile'
             }
         }
 
-        stage('Docker Build') {
+        stage('Test') {
             steps {
-                bat 'docker build -t rahul/automation:1.0 .'
+                bat 'mvn test'
             }
         }
 
-        stage('Docker Push') {
+        stage('Package') {
             steps {
-                bat 'docker push rahul/automation:1.0'
-            }
-        }
-
-        stage('Deploy to Remote Server') {
-            steps {
-                sshagent(['remote-ssh']) {
-                    bat '''
-                    ssh remote_user@REMOTE_IP docker pull rahul/automation:1.0
-                    ssh remote_user@REMOTE_IP docker run -d rahul/automation:1.0
-                    '''
-                }
+                bat 'mvn package'
             }
         }
     }
