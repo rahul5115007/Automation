@@ -7,20 +7,41 @@ pipeline {
 
     environment {
         MAVEN_OPTS = '-Dmaven.repo.local=.m2'
+        ENV = 'qa'
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                echo 'Source code checked out from GitHub'
+                echo 'Code checked out from GitHub'
             }
         }
 
-        stage('Validate') {
+        stage('Build') {
             steps {
-                bat 'mvn validate'
+                bat 'mvn clean compile'
             }
+        }
+
+        stage('Execute Tests') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+
+        stage('Package Artifacts') {
+            steps {
+                bat 'mvn package -DskipTests'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Archiving test results'
+            junit 'target/surefire-reports/*.xml'
+            archiveArtifacts artifacts: 'target/**', fingerprint: true
         }
     }
 }
