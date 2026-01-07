@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven-3'
+    }
+
+    stages {
+
+        stage('Build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                bat 'docker build -t rahul/automation:1.0 .'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                bat 'docker push rahul/automation:1.0'
+            }
+        }
+
+        stage('Deploy to Remote Server') {
+            steps {
+                sshagent(['remote-ssh']) {
+                    bat '''
+                    ssh remote_user@REMOTE_IP docker pull rahul/automation:1.0
+                    ssh remote_user@REMOTE_IP docker run -d rahul/automation:1.0
+                    '''
+                }
+            }
+        }
+    }
+}
